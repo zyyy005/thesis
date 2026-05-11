@@ -1,0 +1,26 @@
+clear; clc;
+h = 1;
+x1 = 0;
+x2 = h/2;  
+x3 = h;   
+x_fine = linspace(0, h, 200);
+xi = x_fine / h;
+phi1 = (1 - xi) .* (1 - 2*xi);
+phi2 = 4 * xi .* (1 - xi);
+phi3 = xi .* (2*xi - 1);
+figure('Position', [100, 100, 600, 400]);
+hold on;
+plot(x_fine, phi1, 'r-', 'LineWidth', 2, 'DisplayName', '\phi_1');
+plot(x_fine, phi2, 'g-', 'LineWidth', 2, 'DisplayName', '\phi_2');
+plot(x_fine, phi3, 'b-', 'LineWidth', 2, 'DisplayName', '\phi_3');
+% plot([x1, x2, x3], [0, 0, 0], 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
+legend('show', 'Location', 'best');
+xlabel('x', 'FontSize', 12);
+ylabel('\phi_i(x)', 'FontSize', 12);
+title('单元上的二次插值函数', 'FontSize', 12);
+ylim([-0.2, 1.2]);
+set(gca,'FontSize',12);  
+hold off;
+set(gca,'LooseInset',get(gca,'TightInset'));
+% 导出为无白边PDF
+exportgraphics(gcf,'jihanshu-two.png','Resolution',300);

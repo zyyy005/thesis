@@ -1,0 +1,26 @@
+function [solution,errors]=solve_BDF2_P1_two(alpha,L,T_final,Nx,Nt)
+h=L/Nx;
+tau=T_final/Nt;
+Nn=Nx+1; 
+[x_nodes,elements] = generate_mesh(L,Nx);
+[M,A_mat,free_nodes] = assemble_matrix_two(x_nodes,elements,alpha,h);
+[U_all,time] = time_marching_BDF2_two(M,A_mat,free_nodes,Nn,Nt,tau,alpha);
+u_exact_full= compute_exact_solution_two(x_nodes,T_final,alpha);
+u_numerical_full=zeros(Nn,1);
+u_numerical_full(free_nodes)=U_all(:,end);
+u_exact_free=u_exact_full(free_nodes);
+u_numerical_free=U_all(:,end);
+errors = compute_errors_two(u_numerical_free,u_exact_free,h);
+solution.x_nodes = x_nodes;
+solution.free_nodes = free_nodes;
+solution.elements = elements;
+solution.U_all=U_all;
+solution.U_all_full=u_numerical_full;
+solution.Nn = Nn;
+solution.time = time;
+solution.u_exact= u_exact_full;
+solution.u_numerical=u_numerical_free;
+solution.u_numerical_full=u_numerical_full;
+solution.h = h;
+solution.tau = tau;
+end

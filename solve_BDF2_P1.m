@@ -1,0 +1,20 @@
+function [solution,errors]=solve_BDF2_P1(alpha,A,L,T_final,Nx,Nt)
+h=L/Nx;
+tau=T_final/Nt;
+Nn=Nx+1;
+[x_nodes,elements]=generate_mesh(L,Nx);
+[M,A_mat,F,free_nodes]=assemble_matrix(x_nodes,elements,alpha,A,h);
+[U_all,time]=time_marching_BDF2(M,A_mat,F,free_nodes,Nn,Nt,tau);
+u_exact=compute_exact_solution(x_nodes,T_final,A,alpha);
+u_numerical=U_all(:,end);
+errors=compute_errors(u_numerical,u_exact,h);
+solution.x_nodes=x_nodes;
+solution.elements=elements;
+solution.U_all=U_all;
+solution.Nn=Nn;
+solution.time=time;
+solution.u_exact=u_exact;
+solution.u_numerical=u_numerical;
+solution.h=h;
+solution.tau=tau;
+end
