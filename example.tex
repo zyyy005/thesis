@@ -52,7 +52,16 @@ urlcolor=black   % 逗号已删除
 \setlength{\abovedisplayshortskip}{6pt}
 \setlength{\belowdisplayshortskip}{6pt}
 \usepackage{setspace} % 添加这个包
-
+\renewcommand{\proofname}{证明}
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{\par
+	\normalfont
+	\topsep6\p@\@plus6\p@\relax
+	\trivlist
+	\setlength{\itemindent}{2em}%
+	\item[\hskip\labelsep{\songti #1：}]\ignorespaces
+}{\hfill\ensuremath{\square}\endtrivlist\@endpefalse}
+\makeatother
 % 设置段落内部的行距为1.5倍
 \setstretch{1.5}
 % 在导言区（\begin{document}之前）添加以下宏定义
@@ -106,7 +115,7 @@ urlcolor=black   % 逗号已删除
 
 本文以热传导方程的数值解法为核心研究内容，由理论到实践的研究思路，从一维非稳态热传导问题出发，并进一步将数值方法推广至二维情形。研究的基本思路如下：首先，基于分片线性有限元方法（P1）对空间变量进行离散，建立热传导方程的空间半离散格式，并对该半离散格式进行稳定性分析与误差估计；然后，在空间半离散的基础上，进一步在时间项采用二阶向后差分格式（BDF2）进行离散，构造全离散的BDF2-P1格式，并从理论上严格分析其稳定性与收敛性质；最后，借助编程工具实现一维和二维热传导问题的数值模拟，通过数值实验验证所提方法的有效性与实用性，为热传导方程的工程实际应用提供可靠的数值支撑。
 \end{abstract}
-\begin{enabstract}[Heat Conduction Equation, Finite Element Method, Stability, Error Estimate, numerical experiments] %英文摘要
+\begin{enabstract}[Heat Conduction Equation, Finite Element Method, Stability, Error Estimate, Numerical Experiments] %英文摘要
 The heat conduction equation is a parabolic partial differential equation that describes the law of heat diffusion and transfer within media over time. It is widely applied in traditional and emerging engineering fields including engineering heat transfer, geotechnical exploration, intelligent control, and material heat treatment. It is a crucial mathematical tool for characterizing the comprehensive effects of multi-physical fields, optimizing engineering algorithms and revealing the thermokinetic properties of media.
 	
 This thesis takes the numerical solution of heat conduction equations as its core research focus and adopts a theory-to-practice research framework. It first investigates one-dimensional unsteady heat conduction problems, and further extends the relevant research to two-dimensional cases. The fundamental research methodology is structured as follows: First, the spatial variables are discretized using the piecewise linear finite element method (P1) to establish a spatial semi-discrete scheme for the heat conduction equation, followed by a stability analysis and error estimation of this semi-discrete scheme. Subsequently, based on the spatial semi-discretization, the time term is discretized using the second-order backward difference formula (BDF2) to construct a fully discrete BDF2-P1 scheme, and its stability and convergence properties are rigorously analyzed in theory. Finally, numerical simulations of one-dimensional and two-dimensional heat conduction problems are implemented via programming tools. Numerical experiments validate the efficacy and practicability of the proposed method, providing reliable numerical support for engineering applications of the heat conduction equation.
@@ -124,7 +133,7 @@ This thesis takes the numerical solution of heat conduction equations as its cor
 %在众多数值方法中，有限差分法具有直观的数学推导和简便的实现方式的特点，始终是求解热传导方程最为经典的途径之一\cite{loskor2022numerical}。典型的差分格式包括Forward-Time Central-Space格式、Crank-Nicolson格式等\cite{mojumder2023efficient}。近年来，学者们愈发关注不同边界条件对差分格式稳定性与精度的影响，并发展了一系列适用于复杂边界的改进格式。例如，Maturi等人分析了铜材料瞬态热传导方程的有限差分逼近格式\cite{maturi2020finite}；Mojumder等人提出了一种高效的一维热方程有限差分法，并系统分析了其稳定性条件\cite{mojumder2023efficient}。然而，随着求解区域几何形态的复杂化及边界条件的多样化，有限差分法在灵活性上的局限日益凸显，难以适配复杂场景的求解需求\cite{lei2024review}。相比之下，基于变分原理与分片插值的有限元方法，在处理不规则区域和复杂边界方面展现出独特优势，成为弥补有限差分法不足的重要替代方案\cite{chen2010finite}。有限元法在处理复杂区域和非齐次边界条件方面具有明显优势，其基本思想是将连续的求解区域离散为一组有限个且按一定方式相互联结在一起的单元的组合体\cite{王晓峰2008轻型载重汽车正面碰撞控制结构分析与改进}。Dhawan等人采用三次B样条基函数对一维热方程进行了数值求解，展示了有限元法在格式构造上的灵活性\cite{dhawan2009numerical}。雷娜等人对有限元网格生成方法进行了系统综述，指出了有限元法在处理复杂几何区域时的核心优势与发展脉络\cite{lei2024review}。陈锡栋等人亦从工程应用视角梳理了有限元法的发展现状，强调了其在多物理场耦合问题中的关键地位\cite{chen2010finite}。此外，有限体积法作为介于有限差分与有限元之间的数值方法，也在热传导问题的求解中具有一定地位。Asish对扩散方程的有限体积解法进行了系统研究\cite{asish2016finite}；Saptaningtyas等人采用显式有限体积法对热方程进行了数值探索，进一步丰富了热传导问题的数值方法体系\cite{saptaningtyas2018finite}。近年来，国内外学者围绕热传导方程数值求解的空间离散策略、时间推进格式及全离散格式的稳定性与收敛性分析等方面，取得了丰硕成果。研究趋势已逐渐从单一方法的应用，转向更高精度、更强稳定性、更好适应复杂几何与多物理场耦合问题的多元化发展格局。Adomian提出的分解法更是为偏微分方程的解析与数值求解提供了新的视角\cite{adomian1994solution, adomian1998review}；Gorgus等人对比分析了热传导方程的不同数值求解方法，为方法选择提供了理论依据\cite{gorguis2008heat}。具体而言，有限元法求解热传导方程的研究正沿着三个方向深入推进：一是通过优化离散格式，提升对复杂热传导过程的模拟精度与稳定性，完善误差估计体系\cite{adomian1994solution}；二是结合自适应技术与多场耦合框架，突破传统方法的应用局限，拓展其在复杂几何与多物理场耦合问题中的适配能力\cite{lei2024review,chen2010finite}；三是借助并行计算与高效算法设计，提升大规模热传导问题的求解效率，满足工程中的高效仿真需求\cite{李荣华2010偏微分方程数值解法}。
 在众多数值方法中，有限差分法、有限体积法与有限元方法是求解热传导方程的三类方法。有限差分法因直观的数学推导和简易的实现方式，始终是经典之选\cite{loskor2022numerical}；有限体积法介于有限差分法与有限元法之间，在保证物理量守恒性方面具有天然优势，在热传导问题的求解中也占据重要地位；有限元方法则基于变分原理与分片插值，在处理复杂几何区域和非齐次边界条件方面展现出独特优势\cite{chen2010finite}。
 
-三类方法在历史发展上依次递进且各有侧重。有限差分法最早成熟，其核心在于用差商逼近导数，格式构造简单，但受制于规则网格，难以适应复杂区域；典型的差分格式有时间向前差分、空间中心差分格式和Crank-Nicolson格式等\cite{mojumder2023efficient}。近年来，学者们愈发关注不同边界条件对差分格式稳定性与精度的影响，并发展了一系列适用于复杂边界的改进格式。例如，Nchupang等人将不可压缩的纳维–斯托克斯方程写成斜对称形式，并对边界条件施加弱限制，从而在角点上无需特殊处理即可实现有界性；在离散环境中，他们采用高阶有限差分法（SBP）模拟连续过程，并辅以弱边界条件，使用同时近似项（SAT）技术，随后通过SBP-SAT框架正式证明了稳定性\cite{Nchupang2025}；Mojumder等人提出了一种高效的一维热方程有限差分法，并系统分析了其稳定性条件\cite{mojumder2023efficient}。有限体积法随后在工程流体力学领域兴起，通过控制体积积分实现守恒性，兼顾了差分法的简洁与物理意义的清晰。例如，Asish对扩散方程的有限体积解法进行了系统研究\cite{asish2016finite}；Saptaningtyas等人采用显式有限体积法对热方程进行了数值探索，进一步丰富了热传导问题的数值方法体系\cite{saptaningtyas2018finite}。相比之下，有限元方法的发展较晚，其思想源于结构力学，后经数学理论完善形成独立分支，以变分原理和分片插值为根基，能够灵活处理不规则边界与材料非均匀性，成为弥补前两者局限的重要方案\cite{lei2024review,chen2010finite}。比如，准三维有限元方法因具有容易处理计算区域尺寸与土层厚度相差几个数量级的矛盾、对边界条件适用性强、计算效率高等特点，在多层地基复杂条件下的区域渗流计算中展现出独特优势\cite{mei2023quasi3D}。通过之前学者的研究，有限元方法求解热传导问题的研究已形成清晰的发展脉络，早期研究侧重于基本理论框架的建立与格式构造，如Dhawan等人采用三次B样条基函数对一维热方程进行数值求解，展示了有限元方法在基函数选取上的灵活性\cite{dhawan2009numerical}；随后，研究重点逐渐转向网格生成技术，雷娜等人系统综述了有限元网格生成方法，指出其在处理复杂几何区域时的核心优势与发展脉络\cite{lei2024review}。进入二十一世纪，有限元方法在工程应用层面快速拓展，陈锡栋等人从工程视角梳理了其发展现状，强调了其在多物理场综合作用问题中的关键地位\cite{chen2010finite}。此外，Adomian提出的分解法为偏微分方程的数值求解提供了新的视角\cite{adomian1994solution, adomian1998review}；Gorgus等人对比分析了热传导方程的不同数值求解方法，为方法选择提供了理论依据\cite{gorguis2008heat}。
+三种方法在历史发展上依次递进且各有侧重。有限差分法最早成熟，其核心在于利用差商逼近导数，格式构造简单，但受制于规则网格，难以适应复杂区域；典型的差分格式有时间向前差分、空间中心差分格式和Crank-Nicolson格式等\cite{mojumder2023efficient}。近年来，越来越多的学者愈发关注不同边界条件对差分格式稳定性与精度的影响，并发展了一系列适用于复杂边界的改进格式。例如，Nchupang等人将不可压缩的纳维–斯托克斯方程写成斜对称形式，并对边界条件施加弱限制，从而在角点上无需特殊处理即可实现有界性；在离散环境中，他们采用高阶有限差分法（SBP）模拟连续过程，并辅以弱边界条件，使用同时近似项（SAT）技术，随后通过SBP-SAT框架正式证明了稳定性\cite{Nchupang2025}；Mojumder等人提出了一种高效的一维热方程有限差分法，并分析了其稳定性条件\cite{mojumder2023efficient}。有限体积法随后在工程流体力学领域兴起，通过控制体积积分实现守恒性，兼顾了差分法的简洁与物理意义的清晰。例如，Asish对扩散方程的有限体积解法进行了系统研究\cite{asish2016finite}；Saptaningtyas等人采用显式有限体积法对热方程进行了数值探索，进一步丰富了热传导问题的数值方法体系\cite{saptaningtyas2018finite}。相比之下，有限元方法的发展较晚，其思想源于结构力学，后经数学理论完善形成独立分支，以变分原理和分片插值为根基，能够灵活处理不规则边界与材料非均匀性，成为弥补前两者局限的重要方案\cite{lei2024review,chen2010finite}。比如，准三维有限元方法因具有容易处理计算区域尺寸与土层厚度相差几个数量级的矛盾、对边界条件适用性强、计算效率高等特点，在多层地基复杂条件下的区域渗流计算中展现出独特优势\cite{mei2023quasi3D}。通过之前学者的研究，利用有限元方法求解热传导问题的研究已形成清晰的发展脉络，早期研究侧重于基本理论框架的建立与格式构造，如Dhawan等人采用三次B样条基函数对一维热方程进行数值求解，展示了有限元方法在基函数选取上的灵活性\cite{dhawan2009numerical}；随后，研究重点逐渐转向网格生成技术，雷娜等人系统综述了有限元网格的生成方法，指出其在处理复杂几何区域时的核心优势与发展脉络\cite{lei2024review}。进入二十一世纪，有限元方法在工程应用层面快速拓展，陈锡栋等人从工程视角梳理了其发展现状，强调了其在多物理场综合作用问题中的关键地位\cite{chen2010finite}。此外，Adomian提出的分解法为偏微分方程的数值求解提供了新的视角\cite{adomian1994solution, adomian1998review}；Gorgus等人对比分析了热传导方程的不同数值求解方法，为选择不同方法提供了理论依据\cite{gorguis2008heat}。
 
 由此可见，有限元方法求解热传导问题的研究沿着三个方向深入推进：一是通过优化离散格式，提升对复杂热传导过程的模拟精度与稳定性，完善误差估计体系\cite{adomian1994solution}；二是结合自适应技术与多场综合作用框架，突破传统方法的应用局限，拓展其在复杂几何与多物理场问题中的适配能力\cite{lei2024review,chen2010finite}；三是借助并行计算与高效算法设计，提升大规模热传导问题的求解效率，满足工程中的高效仿真需求。总的来说，热传导方程数值求解的研究已从单一方法的应用，转向更高精度、更强稳定性、更好适应复杂几何与多物理场综合作用问题的多元化发展格局。
 \subsection{本文主要内容}
@@ -139,7 +148,7 @@ This thesis takes the numerical solution of heat conduction equations as its cor
 \subsection{本文结构安排}
 第一章阐述热传导方程和有限元方法的研究背景与意义，综述数值求解热传导方程的国内外相关研究现状和发展趋势，明确本文的主要内容和结构框架。
 
-第二章介绍本文所需的数学基础知识，包括Sobolev空间的基本概念与性质、有限元空间的构造方法、椭圆投影算子的定义及其性质、热传导方程的数学模型及其变分形式等，为后续的数值格式构造与分析奠定理论基础。
+第二章介绍本文所需要的数学基础知识，包括Sobolev空间的基本概念与性质、有限元空间的构造、椭圆投影算子的定义及其性质、热传导方程的数学模型及其变分形式等，为后续的数值格式构造与分析奠定理论基础。
 
 第三章介绍带齐次Dirichlet边界条件的热传导方程的有限元分析。首先建立其半离散有限元格式，并分析该格式的稳定性与收敛性；接着结合二阶向后差分格式（BDF2）对时间项进行离散，构造全离散BDF2-P1格式，并系统研究该格式的稳定性条件与误差估计。
 
@@ -184,7 +193,7 @@ H^m(\Omega) = \left\{ v \in L^2(\Omega) : D^{\alpha} v \in L^2(\Omega) \text{ �
 
 为了后文的理论分析，本节将列出几个重要不等式\cite{Wang2004,li2023shuxuewuli}。
 
-（1）\textbf{Cauchy-Schwarz不等式 } \quad
+（1）\textbf{Cauchy-Schwarz不等式 } \enspace
 设 \(f, g \in L^2(\Omega)\)，则有
 \begin{equation}
 	\left| \int_{\Omega} f(x) g(x) \, dx \right| 
@@ -198,7 +207,7 @@ H^m(\Omega) = \left\{ v \in L^2(\Omega) : D^{\alpha} v \in L^2(\Omega) \text{ �
 	\label{eq:cauchy2}
 \end{equation}
 
-（2） \textbf{Young 不等式 } \quad
+（2） \textbf{Young 不等式 } \enspace
 设 \(a, b \geq 0\)，\(p, q > 1\) 且 \(\frac{1}{p} + \frac{1}{q} = 1\)，则有
 \begin{equation}
 	ab \leq \frac{a^p}{p} + \frac{b^q}{q}.
@@ -214,7 +223,7 @@ ab \leq \varepsilon a^2 + \frac{1}{4\varepsilon} b^2, \quad \forall a, b \in \ma
 	\label{eq:young3}
 \end{equation}
 
-（3） \textbf{Minkowski 不等式 } \quad
+（3） \textbf{Minkowski 不等式 } \enspace
 对任意 \(f, g \in L^p(\Omega)\)，成立：
 \begin{equation}
 	\|f + g\|_{L^p(\Omega)} \leq \|f\|_{L^p(\Omega)} + \|g\|_{L^p(\Omega)}, \quad \forall f, g \in L^p(\Omega),\ 
@@ -222,7 +231,7 @@ ab \leq \varepsilon a^2 + \frac{1}{4\varepsilon} b^2, \quad \forall a, b \in \ma
 \end{equation}
 对于 \(p = \infty\) 的情形，Minkowski不等式依然成立，此时范数定义为本质supremum。该不等式在有限元误差估计中具有广泛的应用，常用于将总误差分解为若干子项之和并进行逐项估计。
 
-（4） \textbf{Poincaré 不等式 } \quad
+（4） \textbf{Poincaré 不等式 } \enspace
 如果 \(\Omega\) 为连通且在一个方向上有界的区域，则对每个非负整数 \(m \in \mathbb{N}\)，存在 \(C_p=\text{const} > 0\)，使得
 \begin{equation}
 	\|v\|_{m,\Omega} \leq C_p |v|_{m,\Omega}, \quad \forall v \in H_0^m(\Omega).
@@ -258,7 +267,7 @@ ab \leq \varepsilon a^2 + \frac{1}{4\varepsilon} b^2, \quad \forall a, b \in \ma
 \end{equation}
 其中$\delta_{ij}$为Kronecker符号。
 
-这组基函数\eqref{eq:fem-basis-property}具有局部支集，即每个基函数$\phi_i$仅在节点$x_i$附近的两个相邻单元上取非零值，而在其余区域恒为零，这一性质是的总体刚度矩阵和总体质量矩阵呈现稀疏结构，其具体形式为
+上式\eqref{eq:fem-basis-property}具有局部支集，即每个基函数$\phi_i$仅在节点$x_i$附近的两个相邻单元上取非零值，而在其余区域恒为零，这一性质保证了总体刚度矩阵和总体质量矩阵呈现稀疏结构，其具体形式为
 \begin{equation}
 	\phi_i(x) =
 	\begin{cases}
@@ -362,7 +371,7 @@ ab \leq \varepsilon a^2 + \frac{1}{4\varepsilon} b^2, \quad \forall a, b \in \ma
 
 从量纲分析角度可得热扩散率的单位为m$^2$/s，这与质量扩散系数等传递系数的单位一致，体现了其“扩散”的本质属性。热扩散率的大小直接影响热传导方程的时间演化行为：$\alpha$ 值越大，热量扩散越快，温度分布趋于均匀所需时间越短；反之，$\alpha$ 值越小，热量传递越缓慢，温度梯度持续的时间越长。在工程应用中，热扩散率是选择材料的重要依据：
 （1）高$\alpha$材料具备快速的导热与均温特性，适用于散热器、热交换器等需高效散热或均温的场景。马兴琛的研究利用光热辐射背检测技术对紫铜、铝等高导热金属材料的验证测试表明，准确获取高导热材料的热扩散率对于保障散热器件的性能设计至关重要\cite{Ma2013}；
-（2）低$\alpha$材料导热速率低，所以广泛应用于建筑保温层、高温设备隔热衬里等隔热保温领域。杨杰的研究指出，随着新型建筑保温材料的不断涌现，准确测量其热扩散率等参数是推广应用的先决条件，并实测了EPS板、泡沫玻璃等典型保温材料的热扩散率数据，为建筑节能设计提供了基础依据\cite{Yang2014}。
+（2）低$\alpha$材料导热速率低，所以广泛应用于建筑保温层、高温设备隔热层里等隔热保温领域。杨杰的研究指出，随着新型建筑保温材料的不断涌现，准确测量其热扩散率等参数是推广应用的先决条件，并实测了EPS板、泡沫玻璃等典型保温材料的热扩散率数据，为建筑节能设计提供了基础依据\cite{Yang2014}。
 
 
 从数值计算角度来看，热扩散率$\alpha$直接影响热传导方程时间项离散格式的稳定性条件。对于显式时间项离散格式，为保证数值计算的稳定性，时间步长$\tau$与空间步长$h$需满足下面的不等式：
@@ -403,28 +412,28 @@ u(\boldsymbol{x},0) = u_0(\boldsymbol{x}), \quad \boldsymbol{x} \in \Omega.
 	\end{aligned}
 	\right.
 \end{equation}
-有了方程\eqref{eq:heat-conduction-model}的弱形式，根据经典教材\cite{evans2010partial}得到对于变分问题\eqref{eq:weak-form}的解存在且唯一。接下来考察原问题\eqref{eq:heat-conduction-model}的解（强解）和变分问题\eqref{eq:weak-form}的解（弱解）的关系，由书籍\cite{evans2010partial}可知在适当的函数空间下，若弱解具有足够的光滑性，则弱解就是强解。一般地，在极限意义下，一列弱解的适当极限收敛到强解，从而建立了强解和弱解在理论上的统一。
+有了方程\eqref{eq:heat-conduction-model}的弱形式，根据经典教材得到对于变分问题\eqref{eq:weak-form}的解存在且唯一\cite{evans2010partial}。接下来考察原问题\eqref{eq:heat-conduction-model}的解（强解）和变分问题\eqref{eq:weak-form}的解（弱解）的关系，并且在适当的函数空间下，若弱解具有足够的光滑性，则弱解就是强解\cite{evans2010partial}。一般地，在极限意义下，一列弱解的适当极限收敛到强解，从而建立了强解和弱解在理论上的统一。
 \subsection{本章小结}
 本章围绕研究所需的理论基础展开，讨论如何将热传导方程模型问题转化为变分问题，从而降低方程对解的光滑性要求。首先介绍了Sobolev空间及其子空间，定义了对应的范数与半范数，为描述解的正则性和弱形式的适定性提供了基本函数框架；然后构建了相关的函数空间、有限元空间及其投影算子等基础理论；最后给出带齐次Dirichlet边界条件的热传导方程模型问题，推导了模型的弱形式并说明强解与弱解的关系，为后续有限元离散格式的建立奠定了理论基础。接下来，将讨论本文模型问题的空间半离散格式和时空全离散格式。
 \newpage
 \section{空间半离散形式及全离散BDF2-P1形式}
 本章以前文构建的热传导模型\eqref{eq:heat-conduction-model}为研究对象，完成模型的离散与理论分析。首先对空间变量进行有限元离散，构建其空间半离散格式；在此基础上进一步对时间变量离散，推导得到全离散BDF2-P1格式。同时，对这两类离散格式进行稳定性分析与误差估计，为后续数值方法的有效性、可靠性提供完备的理论依据。
-\subsection{有限元离散}
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\subsection{有限元离散}
 本节针对热传导模型的空间变量开展离散处理，采用分片线性有限元完成空间离散，构建对应的有限元离散模型。
 \subsubsection{空间半离散形式}
-基于基函数\eqref{eq:fem-basis-property}，任意$u_h \in V_h$可表示为时变系数与空间基函数的线性组合：
+基于基函数\eqref{eq:hat_function}，任意$u_h \in V_h$可表示为时变系数与空间基函数的线性组合：
 \[
 u_h(x,t) = \sum_{j=2}^{N} u_j(t) \phi_j(x),
 \]
 其中 $u_j(t) = u_h(x_j,t)$ 为节点 $x_j$ 处的时变系数，即温度函数在节点上的值。这种分离变量的表示形式将原无穷维问题转化为关于系数 $\{u_j(t)\}_{j=2}^{N}$ 的常微分方程组，从而为后续的时间离散奠定了基础。
 
-对于固定的$t \in [0,T]$,求$u_h(x,t) \in V_h$,使得
+对于固定的$t \in [0,T]$，求$u_h(x,t) \in V_h$，使得
 \begin{equation}
 	\label{eq:patial-semidiscretization}
 	\left\{
 	\begin{aligned}
 		\left( \frac{\partial u_h}{\partial t}, v \right) +  a(u_h,v) &= (f, v), && \forall v \in V, \\
-		u_h(x,0) &= u_{0,h}(x), && x \in \Omega.
+		u_h(x,0) &= u_{0,h}(x), && x \in \Omega,
 	\end{aligned}
 	\right.
 \end{equation}
@@ -436,7 +445,7 @@ u_h(x,t) = \sum_{j=2}^{N} u_j(t) \phi_j(x),
 \end{equation}
 其中$k \geq1$为有限元空间$V_h$中所用分片多项式的次数。不等式\eqref{eq:approx_property}表明，对于足够光滑的函数$u$，空间$V_h$中总存在一个逼近元（例如插值或椭圆投影），使得$L^2$误差以$h^{k+1}$阶收敛，梯度误差以$h^{k}$阶收敛，这与有限元方法的最佳收敛阶理论相吻合。
 
-对于空间半离散问题\eqref{eq:patial-semidiscretization}，取测试函数 $v = u_h \in V_h$，则得到式\eqref{eq:fe-weak-form}。
+对于空间半离散问题\eqref{eq:patial-semidiscretization}，取测试函数 $v = u_h \in V_h$，则可得
 \begin{align}
 	\left( \frac{\partial u_h}{\partial t}, u_h \right) + a(u_h, u_h) &= (f, u_h),\quad \forall u_h \in V_h.
 	\label{eq:fe-weak-form} 
@@ -552,7 +561,7 @@ u_h(x,t) = \sum_{j=2}^{N} u_j(t) \phi_j(x),
 		\frac{d}{dt}\|\theta\|_{L^2(\Omega)} \leq \|\rho_t\|_{L^2(\Omega)}.
 		\label{eq:theta-differential}
 	\end{equation}
-	式\eqref{eq:theta-differential}两边从0到t积分可得，
+	式\eqref{eq:theta-differential}两边从0到$t$积分可得，
 	\begin{equation}
 		\|\theta(t)\|_{L^2(\Omega)} \leq \int_0^t \|\rho_t\|_{L^2(\Omega)} \mathrm{d}s+\|\theta(0) \|_{L^2(\Omega)}. 
 		\label{eq:theta-integral}
@@ -682,7 +691,7 @@ u_h^0 = u_{0,h}(x), \quad x \in \Omega.
 \end{equation}
 	这里注意到 $\| u_h^m \|^2 \leq 4 E_h^m$，代入式\eqref{eq:energy_ineq}并结合\eqref{eq:discrete_energy}得：
 \begin{equation}\label{eq:wen}
-		\frac{1}{\tau} (E_h^m - E_h^{m-1}) +(1-\frac{\tau}{2}) \| \nabla u_h^m \|^2 \leq \frac{1}{2} \| f^m \|^2 + 2E_h^m.
+		\frac{1}{\tau} (E_h^m - E_h^{m-1}) +\left(1-\frac{\tau}{2}\right) \| \nabla u_h^m \|^2 \leq \frac{1}{2} \| f^m \|^2 + 2E_h^m.
 \end{equation}
 	式\eqref{eq:wen}两边乘以 $\tau$ 并移项,当时间步长 $\tau$ 满足 $0 < \tau \leq \frac{1}{4}$ 时，有 $1 - 2\tau \geq \frac{1}{2}$，则得：
 	\begin{equation}\label{eq:final_recursion}
@@ -690,7 +699,7 @@ u_h^0 = u_{0,h}(x), \quad x \in \Omega.
 	\end{equation}
 	对 $m = 2, 3, \dots, M$ 递归应用，可得：
 	\begin{equation}\label{eq:diguishi}
-	E_h^M \leq C ( E_h^1 + \tau \sum_{m=2}^M \| f^m \|^2 ),
+	E_h^M \leq C \left( E_h^1 + \tau \sum_{m=2}^M \| f^m \|^2 \right),
 	\end{equation}
 	其中常数 $C=e^{2T}$，$T = M\tau$。进一步，由 $E_h^m$ 的定义及向量三角不等式
 \begin{equation}
@@ -845,7 +854,7 @@ u_h^0 = u_{0,h}(x), \quad x \in \Omega.
 
 \subsection{本章小结}
 %本章针对一维热传导问题，构建了有限元空间半离散格式与全离散BDF2-P1格式，并系统分析了其数值稳定性与收敛性。首先，基于有限元空间，利用节点基函数将原问题转化为关于节点系数的常微分方程组，建立空间半离散格式；借助有限元插值理论，证明了半离散解在$L^2$范数下对初始数据与源项的连续依赖性。其次，通过引入椭圆投影算子，将误差分解为投影误差与离散误差，导出最优阶误差估计，收敛阶达$O(h^{k+1})$。接着，采用二阶向后差分格式离散时间导数，构造全离散BDF2-P1格式，证明在时间步长$\tau$满足特定条件时格式的稳定性，体现离散能量的非增性。进一步，通过误差分解与稳定性分析，获得全离散格式在$L^2$范数下的最优阶误差估计。最后，将一维情形的离散格式的构造方法推广至二维，阐述一维与二维情形的共同点和区别。综上，理论严格证明了该格式对一维热传导问题稳定且收敛，时间方向二阶精度，空间方向$L^2$范数下$k+1$阶最优收敛性，为数值实验提供了理论依据。
-本章针对一维热传导问题，构建了有限元空间半离散格式与全离散BDF2-P1格式，并对两种格式的数值稳定性与收敛性进行了全面且严格的理论分析。首先，建立空间半离散格式并证明其解的连续依赖性，通过椭圆投影算子导出最优阶误差估计；然后，构造全离散格式并证明其稳定性，获得$L^2$范数下最优阶误差估计；最后，将一维情形下离散格式的构造思路与分析方法推广至二维热传导问题，详细阐述了一维与二维情形的共同点与核心区别，为后续二维问题的深入研究奠定基础。此外，为验证本文数值方法对非线性模型的适配性与有效性，第四章将结合数值算例进行验证。
+本章针对带齐次Dirichlet边界条件的一维热传导问题，构建了空间半离散格式与全离散BDF2-P1格式，并对两种格式的数值稳定性与收敛性进行了完整的理论分析。首先，建立空间半离散格式并证明其解的连续依赖性，通过椭圆投影算子导出最优阶误差估计；然后，构造其时空全离散格式并证明其稳定性，获得$L^2$范数下最优阶误差估计；最后，将一维情形下离散格式的构造思路与分析方法推广至二维热传导问题，详细阐述了一维与二维情形的共同点与核心区别，为后续二维问题的深入研究奠定基础。此外，为验证本文数值方法对非线性模型的适配性与有效性，第四章将结合具体的数值算例进行验证。
 \newpage
 \section{数值实验}
 理论分析与数值验证相辅相成。前文已从理论上详细分析了空间半离散和时空全离散格式的稳定性与收敛性，本章将通过构造合适的数值算例，对该理论分析的正确性与有效性进行验证，从而为算法的实际应用提供依据。
@@ -927,7 +936,7 @@ F=
 	= \frac{1}{\tau}M\mathbf{u}^{m-1} + F.
 \end{equation}
 
-在实际数值实现中，还充分利用了系统矩阵的结构特性以提高计算效率；由于系数矩阵$\left( \frac{3}{2\tau}M + A \right)$和$\left( \frac{1}{\tau}M + A \right)$均对称正定且保持稀疏性，在时间循环开始前分别对两者进行LU分解并存储分解结果，避免了在每个时间步重复分解矩阵。求解时，对于第一步采用向后欧拉格式，后续每一步则采用二阶向后差分格式推进；在存储方面，采用解向量滚动更新策略，仅保留最近三个时间层的解,并通过自由节点索引区分边界与内部节点，从而有效控制内存占用并提升计算效率；该算法在保证二阶时间精度的同时，具有良好的数值稳定性，适用于长时间热传导模拟，其具体算法见附录的算法1。
+在实际数值实现中，还充分利用了系统矩阵的结构特性以提高计算效率；由于系数矩阵$\left( \frac{3}{2\tau}M + A \right)$和$\left( \frac{1}{\tau}M + A \right)$均对称正定且保持稀疏性，在时间循环开始前分别对两者进行LU分解并存储分解结果，避免了在每个时间步重复分解矩阵。求解时，对于第一步采用向后欧拉格式，后续每一步则采用二阶向后差分格式推进；在存储方面，采用解向量滚动更新策略，仅保留最近三个时间层的解，并通过自由节点索引区分边界与内部节点，从而有效控制内存占用并提升计算效率；该算法在保证二阶时间精度的同时，具有良好的数值稳定性，适用于长时间热传导模拟，其具体算法见附录的算法1。
 
 当$T=1$时，由数值计算得出的结果如图\ref{fig:FEM_solution}所示。
 \begin{figure}[H]
@@ -963,7 +972,8 @@ F=
 为验证BDF2-P1有限元方法在空间离散上的收敛性，这里固定时间步长$\tau=0.001$，观察不同空间网格下的数值误差。表\refeq{tab:spatial_convergence}展示了空间收敛性分析结果，表\ref{tab:temporal_convergence}展示了时间收敛性分析结果。
 \begin{table}[htbp]
 	\centering
-	\caption{\textbf{BDF2-P1有限元方法空间收敛性分析} (算例1，$\tau=0.001$)}
+	\zihao{5}\songti
+	\caption{BDF2-P1有限元方法空间收敛性分析(算例1，$\tau=0.001$)}
 	\label{tab:spatial_convergence}
 	\begin{tabular}{cccccc}
 		\toprule
@@ -986,7 +996,8 @@ F=
 为验证BDF2-P1有限元方法在时间离散上的收敛性，这里固定空间网格$N_x=200$（$h=0.005$），观察不同时间步长下的数值误差。
 \begin{table}[htbp]
 	\centering
-	\caption{\textbf{BDF2-P1有限元方法时间收敛性分析} (算例1，$h=0.005$)}
+	\zihao{5}\songti
+	\caption{BDF2-P1有限元方法时间收敛性分析 (算例1，$h=0.005$)}
 	\label{tab:temporal_convergence}
 	\begin{tabular}{cccccc}
 		\toprule
@@ -1049,7 +1060,7 @@ F=
 	\label{eq:exact-solution}
 \end{equation}
 
-本例采用FreeFem++\cite{hecht2013new} 软件进行数值求解。因为在工业界中有许多复杂模型的剖分网格难以全自动生成，而三角形网格是能够有效、贴合模型实现全自动生成的方式，因此本文对计算区域 $\Omega = (0, 1)^2$进行一致的三角形网格剖分。如图\eqref{fig:wangge}所示。
+本例采用FreeFem++\cite{hecht2013new} 软件进行数值求解。因为在工业界中有许多复杂模型的剖分网格难以全自动生成，而三角形网格是能够有效、贴合模型实现全自动生成的方式，因此本文对计算区域 $\Omega = (0, 1)^2$进行一致的三角形网格剖分。如图\ref{fig:wangge}所示。
 \begin{figure}[H]
 	\centering
 	\includegraphics[height=5cm]{mesh.eps}  % 固定高度
@@ -1101,19 +1112,16 @@ F=
 \end{aligned}
 \right.
 \] 
-其中$I_j(x)$ 表示第一类型$j$阶修正Bessel函数。其幂级数展开为
-\[
-	I_j(z) = \sum_{k=0}^\infty \frac{(z/2)^{j+2k}}{k! (j+k)!}.
-	\]
-满足修正贝塞尔方程 $z^2 y'' + z y' - (z^2 + j^2)y = 0$。
+其中$I_j(x)$ 表示第一类型$j$阶修正Bessel函数。
 
-问题\eqref{eq:nonlinear}有了解析解\eqref{eq:burgers-analytic-solution}，可通过对该问题进行数值离散与求解，将数值解与解析解进行对比，以此验证所构造数值方法的有效性与可靠性。在空间方向上，采用分片有限元方法进行离散，将非线性抛物型偏微分方程投影至有限维试探函数空间，得到空间半离散格式；在此基础上，对时间导数项采用二阶向后差分格式进行离散，得到全离散BDF-P1格式。通过上述离散策略，问题被转化为一组非线性代数方程组。针对方程组中的非线性项，引入牛顿迭代法进行线性化与求解，最终获得各时间步的数值解，其具体算法见附录的算法3。
+问题\eqref{eq:nonlinear}有了解析解\eqref{eq:burgers-analytic-solution}，可通过对该问题进行数值离散与求解，将数值解与解析解进行对比，以此验证所构造数值方法的有效性与可靠性。在空间方向上，采用分片有限元方法进行离散，将非线性抛物型偏微分方程投影至有限维函数空间，弱化方程高阶导数约束，推导得到空间半离散格式；在空间离散的基础上，对时间导数项采用二阶向后差分格式进行离散，得到全离散BDF-P1格式。通过上述离散策略，问题被转化为一组非线性代数方程组；针对方程组中的非线性项，引入牛顿迭代法进行线性化与求解，逐时间层完成数值求解，获取各离散时刻下的数值解，其具体算法见附录的算法3。
 %有限元空间是第二章给出的$V_h$\eqref{eq:Vh}，空间剖分与例1一致，则半离散形式为
 %\begin{equation}\label{eq:nonlinear-semi}
 %	\int_0^1 \frac{\partial u_h}{\partial t} v_h \, dx + \int_0^1 u_h \frac{\partial u_h}{\partial x} v_h \, dx + \nu \int_0^1 \frac{\partial u_h}{\partial x} \frac{\partial v_h}{\partial x} \, dx = 0
 %\end{equation}其中$u_h(x,t) = \sum_{j=2}^{N} u_j(t) \phi_j(x)$和$v_h=\phi_i(x),i = 2, \dots, N$
 
-当$\nu=0.1$，$h=0.01$时，不同时刻的数值解图像，以及$t=0.1$时刻在不同节点上的数值解与解析解的对比，如图\ref{fig:nonlinear_solution}和表\ref{tab:compare}所示。
+%当$\nu=0.1$，$h=0.01$时，不同时刻的数值解图像，以及$t=0.1$时刻在不同节点上的数值解与解析解的对比，如图\ref{fig:nonlinear_solution}和表\ref{tab:compare}所示。
+当粘性系数 $\nu=0.1$、空间步长 $h=0.01$ 时，本节给出了问题\eqref{eq:nonlinear}在不同时刻下的数值解演化图像。同时，在 $t=0.1$ 时刻，将各离散节点处的数值解与对应的参考解析解进行对比分析，结果分别如图\ref{fig:nonlinear_solution}和表\ref{tab:compare}所示。
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.5\linewidth]{nonlinear.png}
@@ -1122,7 +1130,8 @@ F=
 \end{figure}
 \begin{table}[htbp]
 	\centering
-	\caption{\textbf{BDF2-P1有限元方法在$t=0.1$时刻的数值解与解析解对比}（算例4，$h=0.01$）}
+	\zihao{5}\songti
+	\caption{BDF2-P1有限元方法在$t=0.1$时刻的数值解与解析解对比（算例4，$h=0.01$）}
 	\label{tab:compare}
 	\begin{tabular}{cccc}
 		\toprule
@@ -1285,36 +1294,36 @@ F=
 	\KwResult{数值解 $\{u_h^n\}_{n=0}^{N_t}$（全节点值）}
 	\BlankLine
 	\textbf{Step 1: 空间离散}\;
-	生成均匀网格 $x_j = jh,\; j=0,\dots,N$，$h=1/N$；\;
-	定义自由度映射（内部节点为自由度，边界节点固定为0）；\;
-	组装全局质量矩阵 $M$ 与刚度矩阵 $A$（标准线性有限元）；\;
+	生成均匀网格 $x_j = jh,\; j=0,\dots,N$，$h=1/N$\;
+	定义自由度映射（内部节点为自由度，边界节点固定为0）\;
+	组装全局质量矩阵 $M$ 与刚度矩阵 $A$（标准线性有限元）\;
 	\BlankLine
 	\textbf{Step 2: 初始条件}\;
-	$\mathbf{u}^0 \gets u_0(x)$ 在自由节点上的值；\;
+	$\mathbf{u}^0 \gets u_0(x)$ 在自由节点上的值\;
 	\BlankLine
 	\textbf{Step 3: BDF1 启动步（向后欧拉）}\;
-	求解 $\left(\frac{1}{\Delta t}M + \nu A\right)\mathbf{u}^1 + \mathbf{N}(\mathbf{u}^1) = \frac{1}{\Delta t}M\mathbf{u}^0$；\;
+	求解 $\left(\frac{1}{\Delta t}M + \nu A\right)\mathbf{u}^1 + \mathbf{N}(\mathbf{u}^1) = \frac{1}{\Delta t}M\mathbf{u}^0$\;
 	（牛顿迭代，初值 $\mathbf{u}^1_0 = \mathbf{u}^0$）\;
 	\BlankLine
 	\textbf{Step 4: BDF2 主循环}\;
 	\For{$n = 2$ to $N_t$（$N_t = T/\Delta t$）}{
-		求解 $\left(\frac{3}{2\Delta t}M + \nu A\right)\mathbf{u}^n + \mathbf{N}(\mathbf{u}^n) = \frac{2}{\Delta t}M\mathbf{u}^{n-1} - \frac{1}{2\Delta t}M\mathbf{u}^{n-2}$；\;
-		牛顿迭代初值：$\mathbf{u}^n_0 = 2\mathbf{u}^{n-1} - \mathbf{u}^{n-2}$（外推）；\;
+		求解 $\left(\frac{3}{2\Delta t}M + \nu A\right)\mathbf{u}^n + \mathbf{N}(\mathbf{u}^n) = \frac{2}{\Delta t}M\mathbf{u}^{n-1} - \frac{1}{2\Delta t}M\mathbf{u}^{n-2}$\;
+		牛顿迭代初值：$\mathbf{u}^n_0 = 2\mathbf{u}^{n-1} - \mathbf{u}^{n-2}$（外推）\;
 	}
 	\BlankLine
 	\textbf{Step 5: 非线性项处理}\;
-	在每个单元上，由自由节点值 $u_1, u_2$ 计算对流贡献及雅可比矩阵，组装到全局残差 $\mathbf{N}$ 和全局雅可比 $\mathbf{J}_N$；\;
+	在每个单元上，由自由节点值 $u_1, u_2$ 计算对流贡献及雅可比矩阵，组装到全局残差 $\mathbf{N}$ 和全局雅可比 $\mathbf{J}_N$\;
 	\BlankLine
 	\textbf{Step 6: 牛顿迭代}\;
 	\Repeat{$\|\mathbf{F}\|_\infty < tol$ 或 达到 $maxIter$}{
-		计算总残差 $\mathbf{F} = \big(\alpha M + \nu A\big)\mathbf{u} + \mathbf{N}(\mathbf{u}) - \mathbf{rhs}$；\;
-		计算总雅可比 $\mathbf{J} = \alpha M + \nu A + \mathbf{J}_N(\mathbf{u})$；\;
-		求解 $\mathbf{J}\,\boldsymbol{\delta} = -\mathbf{F}$；\;
-		更新 $\mathbf{u} \gets \mathbf{u} + \boldsymbol{\delta}$；\;
+		计算总残差 $\mathbf{F} = \big(\alpha M + \nu A\big)\mathbf{u} + \mathbf{N}(\mathbf{u}) - \mathbf{rhs}$\;
+		计算总雅可比 $\mathbf{J} = \alpha M + \nu A + \mathbf{J}_N(\mathbf{u})$\;
+		求解 $\mathbf{J}\,\boldsymbol{\delta} = -\mathbf{F}$\;
+		更新 $\mathbf{u} \gets \mathbf{u} + \boldsymbol{\delta}$\;
 	}
 	\BlankLine
 	\textbf{Step 7: 输出}\;
-	边界节点补零得到全节点解 $\{U^n\}$；\;
+	边界节点补零得到全节点解 $\{U^n\}$\;
 	\KwRet{$\{U^n\}$}
 \end{algorithm}
 %\section*{常用不等式}
