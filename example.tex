@@ -157,7 +157,7 @@ This thesis takes the numerical solution of heat conduction equations as its cor
 第五章总结全文并展望未来可能的研究方向。
 \newpage
 \section{预备知识}
-为后文进行有限元离散和数值分析的需要，本章给出相关的函数空间、椭圆投影算子以及变分形式，为建立热传导方程的有限元格式及其理论分析奠定理论基础。
+为后文进行有限元离散和数值分析，本章给出相关的函数空间、椭圆投影算子以及变分形式，为建立热传导方程的有限元格式及其理论分析奠定理论基础。
 \subsection{Sobolev空间和重要不等式}
 设$\Omega \subset \mathbb{R}^d$（$d=1,2$）是一个具有Lipschitz连续边界$\partial\Omega$的有界连通区域，通过之前所学可知 \(L^p(\Omega)\) 表示 \(\Omega\) 上 \(p\) 次 Lebesgue 可积函数构成的等价类空间，其定义如下：
 \[
@@ -418,7 +418,7 @@ u(\boldsymbol{x},0) = u_0(\boldsymbol{x}), \quad \boldsymbol{x} \in \Omega.
 \newpage
 \section{空间半离散形式及全离散BDF2-P1形式}
 本章以前文构建的热传导模型\eqref{eq:heat-conduction-model}为研究对象，完成模型的离散与理论分析。首先对空间变量进行有限元离散，构建其空间半离散格式；在此基础上进一步对时间变量离散，推导得到全离散BDF2-P1格式。同时，对这两类离散格式进行稳定性分析与误差估计，为后续数值方法的有效性、可靠性提供完备的理论依据。
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\subsection{有限元离散}
+\subsection{有限元离散}
 本节针对热传导模型的空间变量开展离散处理，采用分片线性有限元完成空间离散，构建对应的有限元离散模型。
 \subsubsection{空间半离散形式}
 基于基函数\eqref{eq:hat_function}，任意$u_h \in V_h$可表示为时变系数与空间基函数的线性组合：
@@ -710,7 +710,7 @@ u_h^0 = u_{0,h}(x), \quad x \in \Omega.
 \end{equation}
 	结合这些关系\eqref{eq:inequalities}，最终得到稳定性估计\eqref{eq:BDF2_stability_estimate}。
 \end{proof}
-\endproof
+
 \begin{theorem}[全离散BDF2-P1格式的误差估计]\label{thm:quanwuc}
 设$u(x,t_m)$和$u_h^m$分别是式\eqref{eq:heat-conduction-model}在$t=m\tau$和式\eqref{eq:final_discrete}的解，则满足如下误差估计（以下的$\|\cdot\|$都是$L^2$范数）：
 \begin{equation}\label{eq:error-estimate}
